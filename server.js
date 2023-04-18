@@ -58,10 +58,9 @@ app.get('/weather', (request, response, next) => {
 });
 
 class Forecast {
-  constructor(cityObj){
-    // this.city_name = cityObj.city_name;
-    this.description = `Low of ${cityObj.data[0].low_temp}, high of ${cityObj.data[0].high_temp} with ${cityObj.data[0].weather.description}`;
-    this.valid_date = cityObj.data[0].valid_date;
+  constructor(forecastObj) {
+    this.date = forecastObj.datetime;
+    this.description = forecastObj.weather.description;
   }
 }
 
