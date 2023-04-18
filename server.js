@@ -26,41 +26,52 @@ app.get('/', (request, response) => {
   response.status(200).send('Welcome to my server!');
 });
 
-// app.get('/hello', (request, response)=>{
-//   let firstName = request.query.userFirstName;
-//   let lastName = request.query.userLastName;
+app.get('/hello', (request, response)=>{
+  let firstName = request.query.userFirstName;
+  let lastName = request.query.userLastName;
 
-//   console.log(request.query);
+  console.log(request.query);
 
-//   response.status(200).send(`Hello ${firstName} ${lastName}, welcome to my server!`);
+  response.status(200).send(`Hello ${firstName} ${lastName}, welcome to my server!`);
 
-// });
-
-// app.get('/pet', (request, response, next)=>{
-
-//   try {
-//     let queriedSpecies = request.query.species;
-
-//     let foundPet = petData.find(pet => pet.species === queriedSpecies);
-//     let dataToSend = new Pet(foundPet);
-
-//     response.status(200).send(dataToSend);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// *** CLASS TO GROOM BULKY DATA ***
-// class Pet {
-//   constructor(petObj){
-//     this.name = petObj.name;
-//     this.breed = petObj.breed;
-//   }
-// }
+});
 
 
 // *** HELPFUL START FOR YOUR LAB ***
+app.get('/weather', (request, response, next) => {
 
+  try {
+    let lat = request.query.lat;
+    let lon = request.query.lon;
+    let searchQuery = request.query.searchQuery;
+
+    let foundCity = weatherData.find(city => (city.city_name === searchQuery) || (city.lon === lon) || (city.lat === lat));
+    let dataToSend = new Forecast(foundCity);
+    console.log(dataToSend);
+
+    response.status(200).send(dataToSend);
+
+  } catch (error) {
+    console.log(error.message);
+    next(error);
+  }
+});
+
+class Forecast {
+  constructor(cityObj){
+    // this.city_name = cityObj.city_name;
+    this.description = `Low of ${cityObj.data[0].low_temp}, high of ${cityObj.data[0].high_temp} with ${cityObj.data[0].weather.description}`;
+    this.valid_date = cityObj.data[0].valid_date;
+  }
+}
+
+
+class Forecast {
+  constructor(forecastData) {
+    this.date = forecastData.datetime;
+    this.description = forecastData.weather.description;
+  }
+}
 
 
 // *** CATCH ALL ENDPOINT SHOULD BE THE LAST DEFINED ***
