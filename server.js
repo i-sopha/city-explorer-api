@@ -6,6 +6,8 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 let weatherData = require('./data/weather.json');
+const axios = require('axios');
+
 
 // *** app === server - Need to call Express to create the server
 const app = express();
@@ -37,46 +39,85 @@ app.get('/hello', (request, response)=>{
 });
 
 
-// *** HELPFUL START FOR YOUR LAB ***
-app.get('/weather', (request,response,next)=>{
-  try{
+
+
+
+
+
+
+
+// *** WEATHER ***
+app.get('/weather', async (request, response, next) => {
+
   try {
     let lat = request.query.lat;
     let lon = request.query.lon;
-    let searchQuery = request.query.searchQuery;
+    // let searchQuery = request.query.searchQuery;
 
-    let weather = weatherData.find(city => city.city_name === searchQuery)
+    let weatherUrl = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${lat}&lon=${lon}`;
 
-    let result = weather.data.map(day => new Forecast(day))
+    let weatherData = await axios.get(weatherUrl);
 
-    response.status(200).send(result)
+    let dataToSend = weatherData.data.data.map(day => new Forecast(day));
 
+    response.status(200).send(dataToSend);
 
- response.status(200).send(dataToSend.myWeatherData);
-  }catch(error){
-     next(error);
+  } catch (error) {
+    console.log(error.message);
+    next(error.message);
   }
- 
 
-})
+});
 
-class Weather{
- constructor(weatherObj){
-     this.cityName = weatherObj.city_name,
-     this.lattitude = weatherObj.lon,
-     this.longitude = weatherObj.lat,
-     this.data = weatherObj.data
- }
-    myWeatherData = [];
+class Forecast {
+  constructor(data) {
+    this.date = data.valid_date;
+    this.description = data.weather.description;
 
- generateWeatherData(){
-     this.myWeatherData = this.data.reduce((allweather,dayweather)=>{
-
-         allweather.push({'date':dayweather.datetime},{'hightemp': dayweather.high_temp}, {'lowtemp': dayweather.low_temp});
-         return allweather;
-     },[]);
- }
+  }
 }
+
+
+
+
+
+
+// *** MOVIES ***
+app.get('/movies', async (request, response, next) => {
+  try {
+    // Accept or define my queries -> /photos?city=VALUE
+    let movies = request.query.city;
+
+    // Build out my url to pass to axios -> require axios at the top // npm install axios
+    let moviesUrl = `https://api.themoviedb.org/3/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movies}`;
+
+    // Store my axios data in a variable
+    let moviesData = await axios.get(moviesUrl);
+
+    // Take that result from axios and groom it with my class
+    // NOTE: moviesData.data.results.map -> obj -> to my class
+    let dataToSend = moviesData.data.results.map(obj => new Movies(obj));
+
+    // Groom data and send it in the response
+    response.status(200).send(dataToSend);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// TODO: DEFINE MY MOVIES CLASS and info I want to send to the front end
+class Movies {
+  constructor(movObj){
+    this.src = movObj.backdrop_path;
+    this.title = movObj.title;
+  }
+}
+
+
+
+
+
+
 
 
 // *** CATCH ALL ENDPOINT SHOULD BE THE LAST DEFINED ***
