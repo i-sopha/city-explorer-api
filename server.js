@@ -40,15 +40,16 @@ app.get('/hello', (request, response)=>{
 // *** HELPFUL START FOR YOUR LAB ***
 app.get('/weather', (request,response,next)=>{
   try{
- console.log(weatherData[0].city_name);
- let locaLat = request.query.lat;
- let localLon = request.query.lon;
- let localCity = request.query.city;
- let returnedCity = weatherData.find(city => city.city_name === localCity);
- 
- let dataToSend = new Weather(returnedCity);
- dataToSend.generateWeatherData();
- console.log(dataToSend.myWeatherData);
+  try {
+    let lat = request.query.lat;
+    let lon = request.query.lon;
+    let searchQuery = request.query.searchQuery;
+
+    let weather = weatherData.find(city => city.city_name === searchQuery)
+
+    let result = weather.data.map(day => new Forecast(day))
+
+    response.status(200).send(result)
 
 
  response.status(200).send(dataToSend.myWeatherData);
