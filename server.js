@@ -5,9 +5,10 @@
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
-let weatherData = require('./data/weather.json');
 const axios = require('axios');
 
+//removing weatherData because were are going to import from API
+// let weatherData = require('./data/weather.json');
 
 // *** app === server - Need to call Express to create the server
 const app = express();
@@ -54,7 +55,7 @@ app.get('/weather', async (request, response, next) => {
     let lon = request.query.lon;
     // let searchQuery = request.query.searchQuery;
 
-    let weatherUrl = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${lat}&lon=${lon}`;
+    let weatherUrl = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.REACT_APP_WEATHER_API_KEY}&lat=${lat}&lon=${lon}`;
 
     let weatherData = await axios.get(weatherUrl);
 
@@ -89,7 +90,7 @@ app.get('/movies', async (request, response, next) => {
     let movies = request.query.city;
 
     // Build out my url to pass to axios -> require axios at the top // npm install axios
-    let moviesUrl = `https://api.themoviedb.org/3/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movies}`;
+    let moviesUrl = `https://api.themoviedb.org/3/movie?api_key=${process.env.REACT_APP_MOVIE_API_KEY}&query=${movies}`;
 
     // Store my axios data in a variable
     let moviesData = await axios.get(moviesUrl);
