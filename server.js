@@ -25,18 +25,8 @@ app.listen(PORT, () => console.log(`Yay we are up on port ${PORT}`));
 // *** 2nd arg - callback which will execute when that endpoint is hit
 //              ** 2 parameters, request, response
 
-app.get('/', (request, response) => {
+app.get('/search', (request, response) => {
   response.status(200).send('Welcome to my server!');
-});
-
-app.get('/hello', (request, response)=>{
-  let firstName = request.query.userFirstName;
-  let lastName = request.query.userLastName;
-
-  console.log(request.query);
-
-  response.status(200).send(`Hello ${firstName} ${lastName}, welcome to my server!`);
-
 });
 
 
@@ -71,10 +61,12 @@ app.get('/weather', async (request, response, next) => {
 });
 
 class Forecast {
-  constructor(data) {
-    this.date = data.valid_date;
-    this.description = data.weather.description;
-
+  constructor(weatherObj) {
+    this.date = weatherObj.datetime;
+    this.description = weatherObj.weather.description;
+    this.low = weatherObj.low_temp;
+    this.high = weatherObj.high_temp;
+    this.temp = weatherObj.temp;
   }
 }
 
@@ -109,8 +101,12 @@ app.get('/movies', async (request, response, next) => {
 // TODO: DEFINE MY MOVIES CLASS and info I want to send to the front end
 class Movies {
   constructor(movObj){
-    this.src = movObj.backdrop_path;
+    this.id = movObj.id;
     this.title = movObj.title;
+    this.overview = movObj.overview;
+    this.imgUrl = movObj.poster_path;
+    this.popularity = movObj.popularity;
+    this.releaseDate = movObj.release_date;
   }
 }
 
@@ -130,5 +126,5 @@ app.get('*', (request, response) => {
 // **** ERROR HANDLING - PLUG AND PLAY CODE FROM EXPRESS DOCS ****
 app.use((error, request, response, next) => {
   console.log(error.message);
-  response.status(500).send(error.message);
+  response.status(500).send('Something went wrong');
 });
